@@ -1,0 +1,6 @@
+<Project>
+  <Target Name="CustomBuild">
+    <Message Text="Custom build step running..." Importance="high" />
+    <!-- Add custom build steps here -->
+  </Target>
+</Project>
