@@ -8,12 +8,22 @@ namespace SearchQube.Services
 {
     public class DatabaseService
     {
+        #region Fields
+
         private readonly string _connectionString;
+
+        #endregion Fields
+
+        #region Constructors
 
         public DatabaseService()
         {
-            _connectionString = "server=localhost;user=root;database=searchqube;port=3306;password=your_password";
+            _connectionString = "server=localhost;user=root;database=searchqube;port=3306;password=19720722Db!";
         }
+
+        #endregion Constructors
+
+        #region Methods
 
         public void AddEquipment(Equipment equipment)
         {
@@ -73,5 +83,7 @@ namespace SearchQube.Services
 
             return equipmentList;
         }
+
+        #endregion Methods
     }
 }

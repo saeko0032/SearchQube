@@ -5,7 +5,9 @@ namespace SearchQube.Helpers
 {
     public class ICCardHelper
     {
-        public User ReadUserInformation()
+        #region Methods
+
+        public User? ReadUserInformation()
         {
             try
             {
@@ -27,5 +29,7 @@ namespace SearchQube.Helpers
                 return null;
             }
         }
+
+        #endregion Methods
     }
 }

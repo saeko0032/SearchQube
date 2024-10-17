@@ -1,12 +1,22 @@
-<Window x:Class="SearchQube.Views.BurrowView"
+﻿<Page x:Class="SearchQube.Views.BurrowView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:SearchQube.ViewModels"
+        mc:Ignorable="d"
         Title="Burrow Equipment" Height="350" Width="525">
     <Grid>
-        <TextBlock Text="Burrow Equipment + ScanRFID" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,30,0,0"/>
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Button Content="OK" Width="100" Height="30" Margin="0,10,0,0" Click="OkButton_Click"/>
-        </StackPanel>
-        <Button Content="Back" HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="100" Height="30" Margin="0,0,0,30" Click="BackButton_Click"/>
+        <Grid.DataContext>
+            <vm:BurrowViewModel />
+        </Grid.DataContext>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Text="Burrow Equipment" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,30,0,0" />
+        <TextBlock Grid.Row="1" Text="Scan RFID Tag and press OK" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,30,0,0" />
+        <Button Grid.Row="2" Content="OK" Width="100" Height="30" Margin="0,10,0,0" Command="{Binding OkCommand}" />
     </Grid>
-</Window>
+</Page>

@@ -6,6 +6,8 @@ namespace SearchQube.Services
 {
     public class RFIDCardService
     {
+        #region Methods
+
         public async Task<Equipment> ReadEquipmentInfoAsync()
         {
             // Simulate reading equipment information from RFID card
@@ -19,5 +21,7 @@ namespace SearchQube.Services
                 Location = "Sample Location"
             };
         }
+
+        #endregion Methods
     }
 }

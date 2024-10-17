@@ -6,27 +6,49 @@ using System.Windows.Input;
 using SearchQube.Models;
 using SearchQube.Services;
 using SearchQube.Helpers;
+using CommunityToolkit.Mvvm.Input;
 
 namespace SearchQube.ViewModels
 {
     public class ReturnViewModel : INotifyPropertyChanged
     {
-        private readonly RFIDCardService _rfidCardService;
-        private readonly ExcelService _excelService;
-        private readonly NavigationHelper _navigationHelper;
+        #region Fields
 
+        private readonly ExcelService _excelService;
+        private readonly RFIDCardService _rfidCardService;
+        private ObservableCollection<Equipment> _equipmentList;
         private string _statusMessage;
-        public string StatusMessage
+
+        #endregion Fields
+
+        #region Constructors
+
+#pragma warning disable CS8618 // null 非許容のフィールドには、コンストラクターの終了時に null 以外の値が入っていなければなりません。Null 許容として宣言することをご検討ください。
+
+        public ReturnViewModel()
+#pragma warning restore CS8618 // null 非許容のフィールドには、コンストラクターの終了時に null 以外の値が入っていなければなりません。Null 許容として宣言することをご検討ください。
         {
-            get => _statusMessage;
-            set
-            {
-                _statusMessage = value;
-                OnPropertyChanged();
-            }
+            _rfidCardService = new RFIDCardService();
+            _excelService = new ExcelService();
+
+            EquipmentList = new ObservableCollection<Equipment>();
+
+            OkCommand = new RelayCommand(ExecuteOkCommand);
+            BackCommand = new RelayCommand(ExecuteBackCommand);
         }
 
-        private ObservableCollection<Equipment> _equipmentList;
+        #endregion Constructors
+
+        #region Events
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        #endregion Events
+
+        #region Properties
+
+        public ICommand BackCommand { get; }
+
         public ObservableCollection<Equipment> EquipmentList
         {
             get => _equipmentList;
@@ -38,38 +60,51 @@ namespace SearchQube.ViewModels
         }
 
         public ICommand OkCommand { get; }
-        public ICommand BackCommand { get; }
 
-        public ReturnViewModel()
+        public string StatusMessage
         {
-            _rfidCardService = new RFIDCardService();
-            _excelService = new ExcelService();
-            _navigationHelper = new NavigationHelper();
-
-            EquipmentList = new ObservableCollection<Equipment>();
-
-            OkCommand = new RelayCommand(ExecuteOkCommand);
-            BackCommand = new RelayCommand(ExecuteBackCommand);
+            get => _statusMessage;
+            set
+            {
+                _statusMessage = value;
+                OnPropertyChanged();
+            }
         }
 
-        private async void ExecuteOkCommand(object parameter)
+        #endregion Properties
+
+        #region Methods
+
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void ExecuteBackCommand()
+        {
+            NavigationHelper.NavigateTo("BurrowOrReturnView");
+        }
+
+        private async void ExecuteOkCommand()
         {
             StatusMessage = "Reading equipment information...";
-            var equipment = await _rfidCardService.ReadEquipmentAsync();
+            var equipment = await _rfidCardService.ReadEquipmentInfoAsync();
 
             if (equipment != null)
             {
-                var isMatched = _excelService.CompareEquipmentId(equipment.Id);
+#pragma warning disable CS8604 // Null 参照引数の可能性があります。
+                var isMatched = _excelService.CompareTerminalId(equipment.TerminalId);
+#pragma warning restore CS8604 // Null 参照引数の可能性があります。
 
                 if (isMatched)
                 {
-                    EquipmentList.Add(equipment);
-                    _navigationHelper.NavigateTo("ReturnEquipmentListView");
+                    //EquipmentList.Add(equipment);
+                    NavigationHelper.NavigateTo("ReturnEquipmentListView");
                 }
                 else
                 {
                     StatusMessage = "Error: Unknown Equipment";
-                    _navigationHelper.NavigateTo("ErrorView");
+                    NavigationHelper.NavigateTo("ErrorView");
                 }
             }
             else
@@ -78,16 +113,6 @@ namespace SearchQube.ViewModels
             }
         }
 
-        private void ExecuteBackCommand(object parameter)
-        {
-            _navigationHelper.NavigateTo("BurrowOrReturnView");
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        #endregion Methods
     }
 }

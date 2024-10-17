@@ -2,8 +2,13 @@ namespace SearchQube.Models
 {
     public class Equipment
     {
-        public string TerminalId { get; set; }
-        public string Info { get; set; }
-        public string Location { get; set; }
+        #region Properties
+
+        public string? Id { get; set; }
+        public string? Info { get; set; }
+        public string? Location { get; set; }
+        public string? TerminalId { get; set; }
+
+        #endregion Properties
     }
 }

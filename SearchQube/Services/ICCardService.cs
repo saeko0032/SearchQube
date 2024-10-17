@@ -6,7 +6,9 @@ namespace SearchQube.Services
 {
     public class ICCardService
     {
-        public User ReadUserInformation()
+        #region Methods
+
+        public User? ReadUserInformation()
         {
             try
             {
@@ -28,5 +30,7 @@ namespace SearchQube.Services
                 return null;
             }
         }
+
+        #endregion Methods
     }
 }

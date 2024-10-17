@@ -8,11 +8,71 @@ namespace SearchQube.Helpers
 {
     public class ExcelHelper
     {
+        #region Fields
+
         private readonly string _filePath;
+
+        #endregion Fields
+
+        #region Constructors
 
         public ExcelHelper(string filePath)
         {
             _filePath = filePath;
+        }
+
+        #endregion Constructors
+
+        #region Methods
+
+        public bool CompareEmployeeId(string employeeId)
+        {
+            var users = ReadUsers();
+            foreach (var user in users)
+            {
+                if (user.EmployeeId == employeeId)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool CompareTerminalId(string terminalId)
+        {
+            var equipments = ReadEquipments();
+            foreach (var equipment in equipments)
+            {
+                if (equipment.TerminalId == terminalId)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public List<Equipment> ReadEquipments()
+        {
+            var equipments = new List<Equipment>();
+
+            using (var package = new ExcelPackage(new FileInfo(_filePath)))
+            {
+                var worksheet = package.Workbook.Worksheets[1];
+                var rowCount = worksheet.Dimension.Rows;
+
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    var equipment = new Equipment
+                    {
+                        TerminalId = worksheet.Cells[row, 1].Text,
+                        Info = worksheet.Cells[row, 2].Text,
+                        Location = worksheet.Cells[row, 3].Text
+                    };
+                    equipments.Add(equipment);
+                }
+            }
+
+            return equipments;
         }
 
         public List<User> ReadUsers()
@@ -40,54 +100,6 @@ namespace SearchQube.Helpers
             return users;
         }
 
-        public List<Equipment> ReadEquipments()
-        {
-            var equipments = new List<Equipment>();
-
-            using (var package = new ExcelPackage(new FileInfo(_filePath)))
-            {
-                var worksheet = package.Workbook.Worksheets[1];
-                var rowCount = worksheet.Dimension.Rows;
-
-                for (int row = 2; row <= rowCount; row++)
-                {
-                    var equipment = new Equipment
-                    {
-                        TerminalId = worksheet.Cells[row, 1].Text,
-                        Info = worksheet.Cells[row, 2].Text,
-                        Location = worksheet.Cells[row, 3].Text
-                    };
-                    equipments.Add(equipment);
-                }
-            }
-
-            return equipments;
-        }
-
-        public bool CompareEmployeeId(string employeeId)
-        {
-            var users = ReadUsers();
-            foreach (var user in users)
-            {
-                if (user.EmployeeId == employeeId)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public bool CompareTerminalId(string terminalId)
-        {
-            var equipments = ReadEquipments();
-            foreach (var equipment in equipments)
-            {
-                if (equipment.TerminalId == terminalId)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
+        #endregion Methods
     }
 }

@@ -2,35 +2,44 @@ using System;
 using System.ComponentModel;
 using System.Windows.Input;
 using SearchQube.Helpers;
+using CommunityToolkit.Mvvm.Input;
 
 namespace SearchQube.ViewModels
 {
     public class SuccessViewModel : INotifyPropertyChanged
     {
-        private string _successMessage;
+        #region Constructors
+
+#pragma warning disable CS8618 // null 非許容のフィールドには、コンストラクターの終了時に null 以外の値が入っていなければなりません。Null 許容として宣言することをご検討ください。
 
         public SuccessViewModel()
+#pragma warning restore CS8618 // null 非許容のフィールドには、コンストラクターの終了時に null 以外の値が入っていなければなりません。Null 許容として宣言することをご検討ください。
         {
             HomeCommand = new RelayCommand(NavigateToHome);
             LogOutCommand = new RelayCommand(LogOut);
         }
 
-        public string SuccessMessage
-        {
-            get => _successMessage;
-            set
-            {
-                _successMessage = value;
-                OnPropertyChanged(nameof(SuccessMessage));
-            }
-        }
+        #endregion Constructors
+
+        #region Events
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        #endregion Events
+
+        #region Properties
 
         public ICommand HomeCommand { get; }
+
         public ICommand LogOutCommand { get; }
 
-        private void NavigateToHome()
+        #endregion Properties
+
+        #region Methods
+
+        protected virtual void OnPropertyChanged(string propertyName)
         {
-            NavigationHelper.NavigateTo("HomeView");
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         private void LogOut()
@@ -40,11 +49,11 @@ namespace SearchQube.ViewModels
             NavigationHelper.NavigateTo("HomeView");
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName)
+        private void NavigateToHome()
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            NavigationHelper.NavigateTo("BurrowOrReturnView");
         }
+
+        #endregion Methods
     }
 }

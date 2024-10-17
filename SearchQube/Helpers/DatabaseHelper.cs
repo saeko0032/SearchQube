@@ -8,12 +8,22 @@ namespace SearchQube.Helpers
 {
     public class DatabaseHelper
     {
+        #region Fields
+
         private readonly string _connectionString;
+
+        #endregion Fields
+
+        #region Constructors
 
         public DatabaseHelper()
         {
             _connectionString = "server=localhost;user=root;database=searchqube;port=3306;password=your_password";
         }
+
+        #endregion Constructors
+
+        #region Methods
 
         public void AddEquipment(Equipment equipment)
         {
@@ -73,5 +83,7 @@ namespace SearchQube.Helpers
 
             return equipmentList;
         }
+
+        #endregion Methods
     }
 }

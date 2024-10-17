@@ -1,63 +1,55 @@
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using SearchQube.Models;
+using CommunityToolkit.Mvvm.Input;
 using SearchQube.Services;
 using SearchQube.Helpers;
+using System; // NavigationHelper が定義されている名前空間をインポート
 
 namespace SearchQube.ViewModels
 {
-    public class ReturnEquipmentListViewModel : INotifyPropertyChanged
+    public class ReturnEquipmentListViewModel : ViewModelBase
     {
+        #region Fields
+
         private readonly DatabaseService _databaseService;
-        private readonly NavigationHelper _navigationHelper;
 
-        private ObservableCollection<Equipment> _equipmentList;
-        public ObservableCollection<Equipment> EquipmentList
-        {
-            get => _equipmentList;
-            set
-            {
-                _equipmentList = value;
-                OnPropertyChanged();
-            }
-        }
+        #endregion Fields
 
-        public ICommand OkCommand { get; }
-        public ICommand BackCommand { get; }
+        #region Constructors
 
         public ReturnEquipmentListViewModel()
         {
             _databaseService = new DatabaseService();
-            _navigationHelper = new NavigationHelper();
-
-            EquipmentList = new ObservableCollection<Equipment>();
-
+            ConfirmedEquipments = ExcelService.ConfirmedEquipments;
             OkCommand = new RelayCommand(ExecuteOkCommand);
-            BackCommand = new RelayCommand(ExecuteBackCommand);
         }
 
-        private void ExecuteOkCommand(object parameter)
+        #endregion Constructors
+
+        #region Properties
+
+        public ReadOnlyObservableCollection<Equipment> ConfirmedEquipments { get; }
+
+        public ICommand OkCommand { get; }
+
+        #endregion Properties
+
+        #region Methods
+
+        private void ExecuteOkCommand()
         {
-            foreach (var equipment in EquipmentList)
+            foreach (var equipment in ConfirmedEquipments)
             {
-                _databaseService.DeleteEquipment(equipment.Id);
+#pragma warning disable CS8604 // Null 参照引数の可能性があります。
+                _databaseService.DeleteEquipment(equipment.TerminalId);
+#pragma warning restore CS8604 // Null 参照引数の可能性があります。
             }
 
-            _navigationHelper.NavigateTo("SuccessView");
+            // Navigate to Success screen
+            NavigationHelper.NavigateTo("SuccessView");
         }
 
-        private void ExecuteBackCommand(object parameter)
-        {
-            _navigationHelper.NavigateTo("ReturnView");
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        #endregion Methods
     }
 }

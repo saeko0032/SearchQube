@@ -4,27 +4,48 @@ using System.Windows.Input;
 using SearchQube.Helpers;
 using SearchQube.Models;
 using SearchQube.Services;
+using CommunityToolkit.Mvvm.Input;
 
 namespace SearchQube.ViewModels
 {
     public class BurrowViewModel : INotifyPropertyChanged
     {
-        private readonly RFIDCardService _rfidCardService;
+        #region Fields
+
         private readonly ExcelService _excelService;
-        private readonly NavigationHelper _navigationHelper;
-
-        private string _terminalId;
+        private readonly RFIDCardService _rfidCardService;
         private string _equipmentInfo;
+        private string _terminalId;
 
-        public string TerminalId
+        #endregion Fields
+
+        #region Constructors
+
+#pragma warning disable CS8618 // null 非許容のフィールドには、コンストラクターの終了時に null 以外の値が入っていなければなりません。Null 許容として宣言することをご検討ください。
+
+        public BurrowViewModel()
+#pragma warning restore CS8618 // null 非許容のフィールドには、コンストラクターの終了時に null 以外の値が入っていなければなりません。Null 許容として宣言することをご検討ください。
         {
-            get => _terminalId;
-            set
-            {
-                _terminalId = value;
-                OnPropertyChanged(nameof(TerminalId));
-            }
+            _rfidCardService = new RFIDCardService();
+            _excelService = new ExcelService();
+
+            OkCommand = new RelayCommand(ExecuteOkCommand);
+            BackCommand = new RelayCommand(ExecuteBackCommand);
+
+            WaitForRFIDCardInput();
         }
+
+        #endregion Constructors
+
+        #region Events
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        #endregion Events
+
+        #region Properties
+
+        public ICommand BackCommand { get; }
 
         public string EquipmentInfo
         {
@@ -37,20 +58,41 @@ namespace SearchQube.ViewModels
         }
 
         public ICommand OkCommand { get; }
-        public ICommand BackCommand { get; }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public BurrowViewModel()
+        public string TerminalId
         {
-            _rfidCardService = new RFIDCardService();
-            _excelService = new ExcelService();
-            _navigationHelper = new NavigationHelper();
+            get => _terminalId;
+            set
+            {
+                _terminalId = value;
+                OnPropertyChanged(nameof(TerminalId));
+            }
+        }
 
-            OkCommand = new RelayCommand(ExecuteOkCommand);
-            BackCommand = new RelayCommand(ExecuteBackCommand);
+        #endregion Properties
 
-            WaitForRFIDCardInput();
+        #region Methods
+
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void ExecuteBackCommand()
+        {
+            NavigationHelper.NavigateBack();
+        }
+
+        private void ExecuteOkCommand()
+        {
+            if (_excelService.CompareTerminalId(TerminalId))
+            {
+                NavigationHelper.NavigateTo("BurrowEquipmentListView");
+            }
+            else
+            {
+                NavigationHelper.NavigateTo("ErrorView");
+            }
         }
 
         private async void WaitForRFIDCardInput()
@@ -58,31 +100,11 @@ namespace SearchQube.ViewModels
             var equipment = await _rfidCardService.ReadEquipmentInfoAsync();
             if (equipment != null)
             {
-                TerminalId = equipment.TerminalId;
-                EquipmentInfo = equipment.Info;
+                TerminalId = equipment.TerminalId ?? string.Empty; // Null非許容参照型の修正
+                EquipmentInfo = equipment.Info ?? string.Empty; // Null非許容参照型の修正
             }
         }
 
-        private void ExecuteOkCommand(object parameter)
-        {
-            if (_excelService.CompareTerminalId(TerminalId))
-            {
-                _navigationHelper.NavigateTo("BurrowEquipmentListView");
-            }
-            else
-            {
-                _navigationHelper.NavigateTo("ErrorView");
-            }
-        }
-
-        private void ExecuteBackCommand(object parameter)
-        {
-            _navigationHelper.NavigateBack();
-        }
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        #endregion Methods
     }
 }
